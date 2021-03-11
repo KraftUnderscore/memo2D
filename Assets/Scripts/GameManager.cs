@@ -1,16 +1,25 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(CardsManager))]
 [RequireComponent(typeof(InputManager))]
+[RequireComponent(typeof(UIManager))]
 public class GameManager : MonoBehaviour
 {
     private enum GameState { None_Selected, One_Selected, Two_Selected, }
 
-    private GameState currentState_ = GameState.None_Selected;
+    private GameState currentState_;
 
+    private UIManager UIManager_;
     private CardsManager cardsManager_;
+
+    private int score_;
+    [SerializeField]
+    private int scoreIncrease_;
+    [SerializeField]
+    private int scoreDecrease_;
+    [SerializeField]
+    private int scoreToLose_;
 
     [SerializeField]
     [Range(0f, 5f)]
@@ -19,6 +28,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         cardsManager_ = GetComponent<CardsManager>();
+        UIManager_ = GetComponent<UIManager>();
     }
 
     public void SetDifficulty(int difficulty)
@@ -28,39 +38,50 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        score_ = 0;
+        currentState_ = GameState.None_Selected;
         cardsManager_.DeployCards();
     }
 
     public void RegisterHit(GameObject hitObject)
     {
-        Debug.Log("Current state:" + (int)currentState_);
         if (currentState_ == GameState.Two_Selected) return;
 
         string toParse = hitObject.name;
-        int result = int.Parse(toParse);
+        int cardId = int.Parse(toParse);
 
-        bool hasFlipped = cardsManager_.FlipCard(result);
+        if (!cardsManager_.FlipCard(cardId)) return;
+        
+        UpdateState();
+        UIManager_.UpdateScore(score_);
+        if (score_ <= scoreToLose_)
+        {
+            currentState_ = GameState.Two_Selected;
+            UIManager_.DisplayGameOver();
+        }
+    }
 
-        if (!hasFlipped) return;
-
+    private void UpdateState()
+    {
         if (currentState_ == GameState.One_Selected)
         {
             if (cardsManager_.IsPair())
             {
                 currentState_ = GameState.None_Selected;
                 cardsManager_.RemovePair();
+                score_ += scoreIncrease_;
             }
             else
             {
                 currentState_ = GameState.Two_Selected;
                 StartCoroutine(WaitToUnflipCards());
+                score_ -= scoreDecrease_;
             }
         }
         else
         {
             currentState_ = GameState.One_Selected;
         }
-        Debug.Log("End state:" + (int)currentState_);
     }
 
     private IEnumerator WaitToUnflipCards()

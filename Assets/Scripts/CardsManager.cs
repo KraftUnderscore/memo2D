@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -25,13 +24,25 @@ public class CardsManager : MonoBehaviour
 
     [SerializeField]
     private float offset_;
-    [SerializeField]
     private int maxRowLength_;
     private Vector2 cardSize_;
 
     enum Difficulty { _2x2 = 4, _2x4 = 8, _4x4 = 16 , LAST_VALUE = _4x4}
 
-    private Difficulty difficulty_ = Difficulty._2x2;
+    private Difficulty difficulty_;
+    private Difficulty Difficulty_
+    {
+        get { return difficulty_; }
+        set 
+        { 
+            difficulty_ = value;
+            maxRowLength_ = value switch
+            {
+                Difficulty._2x2 => 2,
+                _ => 4,
+            };
+        }
+    }
 
     private Transform cardsContainer_;
     private List<Card> cardsStorage_;
@@ -66,16 +77,16 @@ public class CardsManager : MonoBehaviour
         switch (difficulty)
         {
             case 0:
-                difficulty_ = Difficulty._2x2;
+                Difficulty_ = Difficulty._2x2;
                 break;
             case 1:
-                difficulty_ = Difficulty._2x4;
+                Difficulty_ = Difficulty._2x4;
                 break;
             case 2:
-                difficulty_ = Difficulty._4x4;
+                Difficulty_ = Difficulty._4x4;
                 break;
             default:
-                difficulty_ = Difficulty._2x2;
+                Difficulty_ = Difficulty._2x2;
                 break;
         }
     }
@@ -130,7 +141,7 @@ public class CardsManager : MonoBehaviour
     {
         ResetGame();
 
-        for (int i = 0; i < (int) difficulty_; i++)
+        for (int i = 0; i < (int) Difficulty_; i++)
             currentGame_.Add(cardsStorage_[i]);
 
         Shuffle();
@@ -151,7 +162,7 @@ public class CardsManager : MonoBehaviour
 
     private void CorrectContainerPosition()
     {
-        switch (difficulty_)
+        switch (Difficulty_)
         {
             case Difficulty._2x2:
                 cardsContainer_.position = new Vector2(-cardSize_.x, -cardSize_.y);
