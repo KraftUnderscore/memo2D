@@ -6,9 +6,10 @@ using UnityEngine;
 [RequireComponent(typeof(UIManager))]
 public class GameManager : MonoBehaviour
 {
-    private enum GameState { None_Selected, One_Selected, Two_Selected, }
+    private enum GameState { None_Selected, One_Selected, Two_Selected, Game_Over }
 
     private GameState currentState_;
+    private bool isPlaying_;
 
     private UIManager UIManager_;
     private CardsManager cardsManager_;
@@ -38,6 +39,7 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        UIManager_.ResetUI();
         score_ = 0;
         currentState_ = GameState.None_Selected;
         cardsManager_.DeployCards();
@@ -45,7 +47,8 @@ public class GameManager : MonoBehaviour
 
     public void RegisterHit(GameObject hitObject)
     {
-        if (currentState_ == GameState.Two_Selected) return;
+        if (currentState_ == GameState.Two_Selected ||
+            currentState_ == GameState.Game_Over ) return;
 
         string toParse = hitObject.name;
         int cardId = int.Parse(toParse);
@@ -53,11 +56,17 @@ public class GameManager : MonoBehaviour
         if (!cardsManager_.FlipCard(cardId)) return;
         
         UpdateState();
+
         UIManager_.UpdateScore(score_);
         if (score_ <= scoreToLose_)
         {
-            currentState_ = GameState.Two_Selected;
+            currentState_ = GameState.Game_Over;
             UIManager_.DisplayGameOver();
+        }
+        else if (cardsManager_.IsDone())
+        {
+            currentState_ = GameState.Game_Over;
+            UIManager_.DisplayVictory();
         }
     }
 
@@ -86,10 +95,8 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator WaitToUnflipCards()
     {
-        Debug.Log("Start timer");
         yield return new WaitForSeconds(secondsToFlipBackCards_);
         cardsManager_.UnflipCards();
         currentState_ = GameState.None_Selected;
-        Debug.Log("End timer");
     }
 }

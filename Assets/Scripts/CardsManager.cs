@@ -1,30 +1,16 @@
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
-
 public class CardsManager : MonoBehaviour
 {
-    private class Card
-    {
-        public Card(int id, int pairId, GameObject cardObj)
-        {
-            id_ = id;
-            pairId_ = pairId;
-            cardObj_ = cardObj;
-            isFlipped_ = false;
-        }
-
-        public int id_ { get; }
-        public int pairId_ { get; }
-        public bool isFlipped_;
-        public GameObject cardObj_ { get; }
-    }
-
     [SerializeField]
     private string cardsContainerTag_;
-
+    [SerializeField]
+    private float spawnDelay_;
     [SerializeField]
     private float offset_;
     private int maxRowLength_;
+    private int matches_;
     private Vector2 cardSize_;
 
     enum Difficulty { _2x2 = 4, _2x4 = 8, _4x4 = 16 , LAST_VALUE = _4x4}
@@ -44,6 +30,8 @@ public class CardsManager : MonoBehaviour
         }
     }
 
+    [SerializeField]
+    private Sprite[] card_faces_;
     private Transform cardsContainer_;
     private List<Card> cardsStorage_;
 
@@ -56,19 +44,22 @@ public class CardsManager : MonoBehaviour
         cardsContainer_ = GameObject.FindGameObjectWithTag(cardsContainerTag_).transform;
         InitializeCardPool();
         currentGame_ = new List<Card>();
-        cardSize_ = cardPrefab_.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
+        cardSize_ = cardPrefab_.GetComponent<BoxCollider2D>().size;
     }
 
     private void InitializeCardPool()
     {
         cardsStorage_ = new List<Card>();
+        int spritesIterator_ = 0;
         for (int i = 0; i < (int) Difficulty.LAST_VALUE; i++)
         {
             GameObject cardObj = Instantiate(cardPrefab_, cardsContainer_);
             cardObj.name = i.ToString();
             cardObj.SetActive(false);
-            Card card = new Card(i, i%2 == 0 ? i + 1 : i - 1,cardObj);
+            Card card = cardObj.GetComponent<Card>(); 
+            card.InitializeCard(i, i%2 == 0 ? i + 1 : i - 1, cardObj, card_faces_[spritesIterator_]);
             cardsStorage_.Add(card);
+            if (i % 2 == 1) spritesIterator_++;
         }
     }
 
@@ -91,9 +82,14 @@ public class CardsManager : MonoBehaviour
         }
     }
 
+    public bool IsDone()
+    {
+        return matches_ == currentGame_.Count;
+    }
+
     public void UnflipCards()
     {
-        currentGame_.ForEach(delegate (Card c) { c.isFlipped_ = false; });
+        currentGame_.ForEach(delegate (Card c) { if(c.isFlipped_) c.Unflip(); });
     }
 
     public bool IsPair()
@@ -116,10 +112,10 @@ public class CardsManager : MonoBehaviour
         {
             if(c.isFlipped_)
             {
-                c.cardObj_.SetActive(false);
-                c.isFlipped_ = false;
+                c.Disappear();
             }
         }
+        matches_ += 2;
     }
 
     public bool FlipCard(int cardId)
@@ -129,8 +125,7 @@ public class CardsManager : MonoBehaviour
             if (c.id_ == cardId)
             {
                 if (c.isFlipped_) break;
-                Debug.Log("flipping " + cardId);
-                c.isFlipped_ = true;
+                c.Flip();
                 return true;
             }
         }
@@ -151,11 +146,11 @@ public class CardsManager : MonoBehaviour
 
     private void ResetGame()
     {
+        matches_ = 0;
         cardsContainer_.position = Vector2.zero;
         foreach (Card card in currentGame_)
         {
-            card.cardObj_.SetActive(false);
-            card.isFlipped_ = false;
+            card.Restore();
         }
         currentGame_.Clear();
     }
@@ -193,8 +188,14 @@ public class CardsManager : MonoBehaviour
     {
         for (int i = 0; i < currentGame_.Count; i++)
         {
-            currentGame_[i].cardObj_.transform.position = new Vector2(i % maxRowLength_ * offset_, (Mathf.FloorToInt(i / maxRowLength_)) * offset_);
-            currentGame_[i].cardObj_.SetActive(true);
+            currentGame_[i].cardObj_.transform.position = new Vector2(i % maxRowLength_ * (cardSize_.x + offset_), (Mathf.FloorToInt(i / maxRowLength_)) * (cardSize_.y + offset_));
+            StartCoroutine(ActivateWithDelay(currentGame_[i].cardObj_, spawnDelay_ * i));
         }
+    }
+
+    private IEnumerator ActivateWithDelay(GameObject obj, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        obj.SetActive(true);
     }
 }
