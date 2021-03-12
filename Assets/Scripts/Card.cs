@@ -65,7 +65,12 @@ public class Card : MonoBehaviour
     public void Restore()
     {
         cardObj_.SetActive(false);
+        cardObj_.transform.localScale = Vector2.one;
         isFlipped_ = false;
         renderer_.sprite = back_;
+        renderer_.color = new Color(renderer_.color.r, renderer_.color.g, renderer_.color.b, 1f);
+        anim_.ResetTrigger("Flip");
+        anim_.ResetTrigger("Unflip");
+        anim_.ResetTrigger("Disappear");
     }
 }

@@ -148,7 +148,7 @@ public class CardsManager : MonoBehaviour
     {
         matches_ = 0;
         cardsContainer_.position = Vector2.zero;
-        foreach (Card card in currentGame_)
+        foreach (Card card in cardsStorage_)
         {
             card.Restore();
         }
