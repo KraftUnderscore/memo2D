@@ -151,7 +151,7 @@ public class CardsManager : MonoBehaviour
 
         Shuffle();
         PlaceCards();
-        CorrectContainerPosition();
+        // CorrectContainerPosition();
         SetUpCamTargets();
 
         return currentGame_.Count * spawnDelay_;
