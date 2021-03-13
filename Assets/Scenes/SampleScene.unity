@@ -708,7 +708,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardsContainerTag_: CardsContainer
-  spawnDelay_: 0.1
+  spawnDelay_: 0.095
   offset_: 0.1
   card_faces_:
   - {fileID: 21300000, guid: 417418e8fde0fb446bc48e778da635aa, type: 3}
@@ -762,6 +762,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scoreText_: {fileID: 1727760925}
   gameOverPanel_: {fileID: 1527114137}
+  startButton_: {fileID: 542930415}
   victoryPanel_: {fileID: 577290706}
 --- !u!1 &577290706
 GameObject:

@@ -132,7 +132,7 @@ public class CardsManager : MonoBehaviour
         return false;
     }
 
-    public void DeployCards()
+    public float DeployCards()
     {
         ResetGame();
 
@@ -142,6 +142,8 @@ public class CardsManager : MonoBehaviour
         Shuffle();
         PlaceCards();
         CorrectContainerPosition();
+
+        return currentGame_.Count * spawnDelay_;
     }
 
     private void ResetGame()

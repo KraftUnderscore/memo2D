@@ -42,7 +42,16 @@ public class GameManager : MonoBehaviour
         UIManager_.ResetUI();
         score_ = 0;
         currentState_ = GameState.None_Selected;
-        cardsManager_.DeployCards();
+
+        float timeToDeploy = cardsManager_.DeployCards();
+        StartCoroutine(ToggleStartButton(timeToDeploy));
+    }
+
+    private IEnumerator ToggleStartButton(float time)
+    {
+        UIManager_.ToggleStartButtonVisibility(false);
+        yield return new WaitForSeconds(time);
+        UIManager_.ToggleStartButtonVisibility(true);
     }
 
     public void RegisterHit(GameObject hitObject)

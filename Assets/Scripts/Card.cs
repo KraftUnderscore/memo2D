@@ -66,6 +66,7 @@ public class Card : MonoBehaviour
     {
         cardObj_.SetActive(false);
         cardObj_.transform.localScale = Vector2.one;
+        cardObj_.transform.rotation = Quaternion.Euler(Vector3.zero);
         isFlipped_ = false;
         renderer_.sprite = back_;
         renderer_.color = new Color(renderer_.color.r, renderer_.color.g, renderer_.color.b, 1f);

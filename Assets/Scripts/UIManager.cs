@@ -8,6 +8,8 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private GameObject gameOverPanel_;
     [SerializeField]
+    private GameObject startButton_;
+    [SerializeField]
     private GameObject victoryPanel_;
 
     public void UpdateScore(int score)
@@ -30,5 +32,11 @@ public class UIManager : MonoBehaviour
         scoreText_.text = 0.ToString();
         gameOverPanel_.SetActive(false);
         victoryPanel_.SetActive(false);
+        ToggleStartButtonVisibility(true);
+    }
+
+    public void ToggleStartButtonVisibility(bool visible)
+    {
+        startButton_.SetActive(visible);
     }
 }
