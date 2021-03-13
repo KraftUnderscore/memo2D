@@ -151,7 +151,6 @@ public class CardsManager : MonoBehaviour
 
         Shuffle();
         PlaceCards();
-        // CorrectContainerPosition();
         SetUpCamTargets();
 
         return currentGame_.Count * spawnDelay_;
@@ -172,22 +171,6 @@ public class CardsManager : MonoBehaviour
             card.Restore();
         }
         currentGame_.Clear();
-    }
-
-    private void CorrectContainerPosition()
-    {
-        switch (Difficulty_)
-        {
-            case Difficulty._2x2:
-                cardsContainer_.position = new Vector2(-cardSize_.x, -cardSize_.y);
-                break;
-            case Difficulty._2x4:
-                cardsContainer_.position = new Vector2(-cardSize_.x - offset_, -cardSize_.y);
-                break;
-            case Difficulty._4x4:
-                cardsContainer_.position = new Vector2(-cardSize_.x - offset_, -cardSize_.y - offset_);
-                break;
-        }
     }
 
     private void Shuffle()

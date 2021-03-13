@@ -112,6 +112,7 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(secondsToFlipBackCards_);
         cardsManager_.UnflipCards();
-        currentState_ = GameState.None_Selected;
+        if(currentState_ != GameState.Game_Over)
+            currentState_ = GameState.None_Selected;
     }
 }
