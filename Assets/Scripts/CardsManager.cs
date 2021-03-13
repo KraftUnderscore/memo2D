@@ -13,6 +13,15 @@ public class CardsManager : MonoBehaviour
     private int matches_;
     private Vector2 cardSize_;
 
+    private Vector2[] camPoints_;
+    public Vector2[] CamPoints_
+    {
+        get
+        {
+            return camPoints_;
+        }
+    }
+
     enum Difficulty { _2x2 = 4, _2x4 = 8, _4x4 = 16 , LAST_VALUE = _4x4}
 
     private Difficulty difficulty_;
@@ -45,6 +54,7 @@ public class CardsManager : MonoBehaviour
         InitializeCardPool();
         currentGame_ = new List<Card>();
         cardSize_ = cardPrefab_.GetComponent<BoxCollider2D>().size;
+        camPoints_ = new Vector2[2];
     }
 
     private void InitializeCardPool()
@@ -142,8 +152,15 @@ public class CardsManager : MonoBehaviour
         Shuffle();
         PlaceCards();
         CorrectContainerPosition();
+        SetUpCamTargets();
 
         return currentGame_.Count * spawnDelay_;
+    }
+    
+    private void SetUpCamTargets()
+    {
+        camPoints_[0] = currentGame_[0].transform.position;
+        camPoints_[1] = currentGame_[currentGame_.Count - 1].transform.position;
     }
 
     private void ResetGame()

@@ -9,8 +9,6 @@ public class GameManager : MonoBehaviour
     private enum GameState { None_Selected, One_Selected, Two_Selected, Game_Over }
 
     private GameState currentState_;
-    private bool isPlaying_;
-
     private UIManager UIManager_;
     private CardsManager cardsManager_;
 
@@ -21,6 +19,8 @@ public class GameManager : MonoBehaviour
     private int scoreDecrease_;
     [SerializeField]
     private int scoreToLose_;
+    [SerializeField]
+    private Transform[] camTargets_;
 
     [SerializeField]
     [Range(0f, 5f)]
@@ -44,7 +44,14 @@ public class GameManager : MonoBehaviour
         currentState_ = GameState.None_Selected;
 
         float timeToDeploy = cardsManager_.DeployCards();
+        PlaceCameraTargets(cardsManager_.CamPoints_);
         StartCoroutine(ToggleStartButton(timeToDeploy));
+    }
+
+    private void PlaceCameraTargets(Vector2[] pos)
+    {
+        camTargets_[0].position = pos[0];
+        camTargets_[1].position = pos[1];
     }
 
     private IEnumerator ToggleStartButton(float time)
@@ -78,7 +85,6 @@ public class GameManager : MonoBehaviour
             UIManager_.DisplayVictory();
         }
     }
-
     private void UpdateState()
     {
         if (currentState_ == GameState.One_Selected)
